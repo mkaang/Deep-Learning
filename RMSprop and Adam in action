@@ -1,0 +1,72 @@
+#SourceFile: https://www.coursera.org/learn/deep-neural-network/discussions/weeks/2/threads/BuJbuZyUEeeYfxKD1QfbqA
+import matplotlib.pyplot as plt
+import numpy as np
+import math
+
+def fn(dW = 1.5, noiseMean = 0, noiseAmplitude = 1, noiseDecay = 1,iterations = 500, beta1 = .95, beta2 =.95):
+    '''Exploration of the effect of momentum and RMSprop
+    
+    red line is dW (we assume it's constant so it's easier to understand what is going on)
+    blue line is momentum of dW + noise we introduce (we pretend it's boucing around)
+    solid green line is dW with RMS prop
+    dotted green line is denominator of RMSprop factor
+    solid black line is Adam optimized dW
+    We don't plot noise itself because it just obscurs the rest but you can uncomment the line to see it.
+
+    Note : once in a while you might get a division by zero error
+    ''' 
+    
+    plt.close() #just in case
+    rms = 0
+    momentum = 0
+    ymomentum = []
+    ydW = []
+    yrms = []
+    yrmsDenominator = []
+    ynoisy = []
+    x  = []
+    noise = []
+    iterations
+    
+    #generate data
+    for i in range (iterations):
+        dW = dW * 1  #play with this if you want to change dW over iterations
+
+        #generate noise
+        noise.append(rnd.normalvariate(noiseMean,noiseAmplitude))
+
+        #append noise to dW
+        dWnoisy = dW + noise[i]
+
+        #decay or amplify noise amplitude by using noisDecay <> 1
+        noiseAmplitude *= noiseDecay
+
+        #Momentum
+        momentum = beta1*momentum + (1-beta1)*dWnoisy
+        
+        #RMS
+        rms = beta2*rms +  (1-beta2)*dWnoisy**2
+
+        #build array of values to plot
+        x.append(i)
+        ymomentum.append(momentum)
+        ydW.append(dW)
+        yrms.append(dW/math.sqrt(rms))
+        yrmsDenominator.append(math.sqrt(rms))
+        ynoisy.append(dWnoisy)
+        
+    #plot data 
+        
+    #plt.plot(noise)
+    plt.plot(x,ydW,'r-',x,ymomentum,'b-',x,yrms,'g-',x,yrmsDenominator,'g--',x,np.array(yrms)*np.array(ymomentum),'k-')
+    plt.grid(True)
+    plt.axis([0,iterations,min(min(ymomentum[50:]),min(yrms[50:]),min(yrmsDenominator[50:]))*-1.05,max(yrmsDenominator[50:])*1.05])
+    plt.show()
+    plt.close()
+    print('average of yrms after iterations number 100: {:f}'.format(np.average(yrms[100:])))
+    return
+
+fn(noiseAmplitude=0)
+fn(noiseAmplitude=1)
+fn(noiseAmplitude=3)
+fn(noiseAmplitude=3,noiseDecay=.993)
